@@ -22,7 +22,33 @@ namespace Core.Services.Implementations
 
         public void Register(Type dependencyType, Type realizationType)
         {
-            
+            if (!dependencyType.IsAssignableFrom(realizationType) &&
+                !IsAssignableFromOpenGenerics(dependencyType, realizationType))
+                throw new DependencyRegistrationException(
+                    $"The dependency type {dependencyType.Name} is not assignable from the realization type {realizationType.Name}.");
+
+            if (realizationType.IsAbstract)
+                throw new DependencyRegistrationException(
+                    $"$The realization type {realizationType.Name} must be overridden.");
+
+            DependenciesMap.TryGetValue(dependencyType, out var implementations);
+            if (implementations == null)
+            {
+                DependenciesMap.Add(dependencyType, ImmutableList.Create(realizationType));
+                return;
+            }
+
+            DependenciesMap[dependencyType] = implementations.Concat(ImmutableList.Create(realizationType));
+        }
+
+        private static bool IsAssignableFromOpenGenerics(Type dependencyType, Type realizationType)
+        {
+            return dependencyType.IsGenericType && realizationType.IsGenericType &&
+                   realizationType.GetInterfaces()
+                       .Select(realizationInterfaceType => realizationInterfaceType.GetGenericTypeDefinition())
+                       .Any(genericRealizationTypeDefinition =>
+                           dependencyType.GetGenericTypeDefinition()
+                               .IsAssignableFrom(genericRealizationTypeDefinition));
         }
     }
 }
