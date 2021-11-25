@@ -41,6 +41,11 @@ namespace Core.Services.Implementations
             DependenciesMap[dependencyType] = implementations.Concat(ImmutableList.Create(realizationType));
         }
 
+        public IDictionary<Type, IEnumerable<Type>> GetDependenciesMap()
+        {
+            return DependenciesMap;
+        }
+
         private static bool IsAssignableFromOpenGenerics(Type dependencyType, Type realizationType)
         {
             return dependencyType.IsGenericType && realizationType.IsGenericType &&
