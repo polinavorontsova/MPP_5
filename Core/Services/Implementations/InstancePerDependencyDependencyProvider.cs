@@ -15,7 +15,13 @@ namespace Core.Services.Implementations
         {
             return (T) Resolve(typeof(T));
         }
-        
+
+        public IEnumerable<T> ResolveAll<T>()
+        {
+            var resolve = (ImmutableList<object>) Resolve(typeof(IEnumerable<T>));
+            return resolve.Select(item => (T) item).ToImmutableList();
+        }
+
         private object Resolve(Type type)
         {
             if (!typeof(IEnumerable).IsAssignableFrom(type))

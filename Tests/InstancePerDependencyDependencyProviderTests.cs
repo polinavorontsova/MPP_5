@@ -45,11 +45,33 @@ namespace Tests
         }
 
         [Test]
+        public void Resolve_ResolveMultipleRealizationsWithNoInnerDependenciesSuccessfully()
+        {
+            var result = DependenciesProvider.ResolveAll<ITest>().ToImmutableList();
+
+            Assert.AreEqual(2, result.Count);
+            Assert.NotNull(result[0]);
+            Assert.NotNull(result[1]);
+        }
+
+        [Test]
         public void Resolve_ResolveRealizationWithGenericDependenciesSuccessfully()
         {
             var result = DependenciesProvider.Resolve<IService<IRepository>>();
 
             Assert.NotNull(result);
+        }
+
+        [Test]
+        public void Resolve_ResolveMultipleRealizationWithGenericDependenciesSuccessfully()
+        {
+            var result = DependenciesProvider.ResolveAll<IService<IRepository>>().ToImmutableList();
+
+            Assert.AreEqual(4, result.Count);
+            Assert.NotNull(result[0]);
+            Assert.NotNull(result[1]);
+            Assert.NotNull(result[2]);
+            Assert.NotNull(result[3]);
         }
 
         [Test]
