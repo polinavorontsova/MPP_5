@@ -85,6 +85,17 @@ namespace Tests
         }
 
         [Test]
+        public void Resolve_CompletelyNewEnumerableInstancesAreCreatedSuccess()
+        {
+            var firstResult = DependenciesProvider.ResolveAll<IService<IRepository>>().ToImmutableList();
+            var secondResult = DependenciesProvider.ResolveAll<IService<IRepository>>().ToImmutableList();
+
+            Assert.AreEqual(firstResult.Count, secondResult.Count);
+            foreach (var dependency in firstResult)
+                Assert.True(secondResult.Any(secondItem => secondItem.Equals(dependency)));
+        }
+
+        [Test]
         public void Resolve_ResolveNotRegisteredDependencyFailure()
         {
             Assert.Throws<DependencyProviderException>(() =>
